@@ -2,15 +2,13 @@ package persistence.dal
 
 import akka.actor.Actor
 import com.typesafe.scalalogging.LazyLogging
-import persistence.entities.{Suppliers, Supplier}
+import persistence.{SuppliersRow, Tables}
 
 import slick.driver.JdbcProfile
-import utils.{DbModule}
 
+object SuppliersRowsDAA {
 
-object SuppliersDAA {
-
-  case class Save(sup: Supplier)
+  case class Save(sup: SuppliersRow)
 
   case class GetSupplierById(id: Int)
 
@@ -19,20 +17,21 @@ object SuppliersDAA {
 }
 
 
-class SuppliersDAA(implicit val db: JdbcProfile#Backend#Database,implicit val profile: JdbcProfile) extends Actor with DbModule with Suppliers with LazyLogging{
+class SuppliersDAA(implicit val db: JdbcProfile#Backend#Database, implicit val profile: JdbcProfile)
+  extends Actor with Tables with LazyLogging {
+
+  import SuppliersRowsDAA._
   import profile.api._
-  import SuppliersDAA._
-  import scala.concurrent.ExecutionContext.Implicits.global
 
   def receive = {
-    case Save(sup) ⇒ sender ! db.run(suppliers += sup)
+    case Save(sup) ⇒ sender ! db.run(Suppliers += sup)
 
-    case GetSupplierById(id) ⇒ sender ! db.run(suppliers.filter(_.id === id).result)
+    case GetSupplierById(id) ⇒ sender ! db.run(Suppliers.filter(_.id === id).result)
 
     case CreateTables =>
       try {
-        sender ! db.run(DBIO.seq(suppliers.schema.create))
-      }  catch {
+        sender ! db.run(DBIO.seq(Suppliers.schema.create))
+      } catch {
         case e: Exception => logger.info("Could not create table of suppliers.... assuming it already exists")
       }
   }
