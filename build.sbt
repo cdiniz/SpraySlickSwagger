@@ -1,5 +1,5 @@
 
-version       := "0.0.3"
+version := "0.0.3"
 
 val slickV = "3.0.0"
 // shared sbt config between main project and codegen project
@@ -7,10 +7,11 @@ val sharedSettings = Defaults.coreDefaultSettings ++ Seq(
   scalaVersion := "2.11.6",
   libraryDependencies ++= Seq(
     "com.typesafe.slick" %% "slick" % slickV,
+    "com.h2database" % "h2" % "1.3.175",
+    "org.postgresql" % "postgresql" % "9.3-1100-jdbc41",
     "mysql" % "mysql-connector-java" % "5.1.35"
   )
 )
-
 /** main project containing main source code depending on slick and codegen project */
 lazy val mainProject = Project(
   id = "main",
@@ -22,13 +23,13 @@ lazy val mainProject = Project(
       Seq(
         "io.spray" %% "spray-can" % sprayV,
         "io.spray" %% "spray-routing" % sprayV,
-        "io.spray"            %%  "spray-testkit" % sprayV  % "test",
+        "io.spray" %% "spray-testkit" % sprayV % "test",
         "io.spray" %% "spray-json" % "1.3.1",
         "com.gettyimages" %% "spray-swagger" % "0.5.1",
         "com.typesafe.akka" %% "akka-actor" % akkaV,
-        "com.typesafe.akka"   %%  "akka-testkit"  % akkaV   % "test",
-        "org.specs2"          %%  "specs2-core"   % "2.3.11" % "test",
-        "org.specs2"          %%  "specs2-mock"   % "2.3.11"  ,
+        "com.typesafe.akka" %% "akka-testkit" % akkaV % "test",
+        "org.specs2" %% "specs2-core" % "2.3.11" % "test",
+        "org.specs2" %% "specs2-mock" % "2.3.11",
         "org.scalatest" % "scalatest_2.11" % "2.2.1" % "test",
         "junit" % "junit" % "4.11" % "test",
         "com.typesafe" % "config" % "1.3.0",
@@ -41,10 +42,9 @@ lazy val mainProject = Project(
       )
     },
     slick <<= slickCodeGenTask // register manual sbt command
-//    ,sourceGenerators in Compile <+= slickCodeGenTask // register automatic code generation on every compile, remove for only manual use
+    //    ,sourceGenerators in Compile <+= slickCodeGenTask // register automatic code generation on every compile, remove for only manual use
   )
 ).dependsOn(codegenProject)
-
 /** codegen project containing the customized code generator */
 lazy val codegenProject = Project(
   id = "codegen",
@@ -69,3 +69,4 @@ lazy val slickCodeGenTask = (dependencyClasspath in Compile, runner in Compile, 
   val fname = file(s"$outputDir/${pkg.replace('.', '/')}/Tables.scala").getAbsolutePath
   Seq(file(fname))
 }
+

@@ -45,8 +45,8 @@ trait Tables {
 }
 /** Entity class storing rows of table Suppliers
    *  @param id Database column id SqlType(INT), AutoInc, PrimaryKey
-   *  @param userid Database column userID SqlType(TEXT)
-   *  @param lastName Database column last_name SqlType(TEXT) */
-  case class SuppliersRow(id: Int, userid: String, lastName: String)
+   *  @param name Database column userID SqlType(TEXT)
+   *  @param desc Database column last_name SqlType(TEXT) */
+  case class SuppliersRow(id: Int, name: String, desc: String)
   /** UX Helper case class without id */
-  case class SimpleSuppliersRow(userid: String, lastName: String)
+  case class SimpleSuppliersRow(name: String, desc: String)

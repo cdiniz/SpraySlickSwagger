@@ -1,7 +1,7 @@
 package rest
 
-import entities.JsonProtocol
-import persistence.entities.{SimpleSupplier, Supplier}
+import persistence.entities.JsonProtocol
+import persistence.{SimpleSuppliersRow, SuppliersRow}
 import spray.httpx.SprayJsonSupport
 import spray.http._
 import StatusCodes._
@@ -20,7 +20,7 @@ class RoutesSpec  extends AbstractRestTest {
     override def actorRefFactory = system
   }
 
-  "Supplier Routes" should {
+  "SuppliersRow Routes" should {
 
     "return an empty array of suppliers" in {
      modules.suppliersDal.getSupplierById(1) returns Future(Vector())
@@ -28,22 +28,22 @@ class RoutesSpec  extends AbstractRestTest {
       Get("/supplier/1") ~> suppliers.SupplierGetRoute ~> check {
         handled must beTrue
         status mustEqual OK
-        responseAs[Seq[Supplier]].length == 0
+        responseAs[Seq[SuppliersRow]].isEmpty
       }
     }
 
     "return an array with 2 suppliers" in {
-      modules.suppliersDal.getSupplierById(1) returns Future(Vector(Supplier(Some(1),"name 1", "desc 1"),Supplier(Some(2),"name 2", "desc 2")))
+      modules.suppliersDal.getSupplierById(1) returns Future(Vector(SuppliersRow(1,"name 1", "desc 1"),SuppliersRow(2,"name 2", "desc 2")))
       Get("/supplier/1") ~> suppliers.SupplierGetRoute ~> check {
         handled must beTrue
         status mustEqual OK
-        responseAs[Seq[Supplier]].length == 2
+        responseAs[Seq[SuppliersRow]].length == 2
       }
     }
 
     "create a supplier with the json in post" in {
-      modules.suppliersDal.save(Supplier(None,"name 1","desc 1")) returns  Future(1)
-      Post("/supplier",SimpleSupplier("name 1","desc 1")) ~> suppliers.SupplierPostRoute ~> check {
+      modules.suppliersDal.save(SuppliersRow(0,"name 1","desc 1")) returns  Future(1)
+      Post("/supplier",SimpleSuppliersRow("name 1","desc 1")) ~> suppliers.SupplierPostRoute ~> check {
         handled must beTrue
         status mustEqual Created
       }
