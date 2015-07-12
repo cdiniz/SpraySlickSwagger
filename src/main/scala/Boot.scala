@@ -1,17 +1,18 @@
-import akka.actor.{Props}
+import akka.actor.Props
 import akka.io.IO
 import akka.pattern.ask
 import akka.util.Timeout
-import rest.{SupplierHttpService, RoutesActor}
+import rest.RoutesActor
 import spray.can.Http
-import utils.{ PersistenceModuleImpl, ActorModuleImpl, ConfigurationModuleImpl}
+import utils.{ActorModuleImpl, ConfigurationModuleImpl, PersistenceModuleImpl}
+
 import scala.concurrent.duration._
 
 
-object Boot extends App   {
+object Boot extends App {
 
   // configuring modules for application, cake pattern for DI
-  val modules = new ConfigurationModuleImpl  with ActorModuleImpl with PersistenceModuleImpl
+  val modules = new ConfigurationModuleImpl with ActorModuleImpl with PersistenceModuleImpl
 
   // create and start our service actor
   val service = modules.system.actorOf(Props(classOf[RoutesActor], modules), "routesActor")
